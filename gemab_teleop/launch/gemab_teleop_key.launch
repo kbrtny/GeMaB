@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="gemab_teleop" type="gemab_teleop_key" name="gemab_teleop_keyboard" output="screen">
+  </node>
+</launch>

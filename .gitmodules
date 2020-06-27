@@ -1,0 +1,9 @@
+[submodule "gemab_arduino/lib/Arduino_SAMD21_turbo_PWM"]
+	path = gemab_arduino/lib/Arduino_SAMD21_turbo_PWM
+	url = https://github.com/kbretney/Arduino_SAMD21_turbo_PWM
+[submodule "rosserial"]
+	path = rosserial
+	url = https://github.com/ros-drivers/rosserial.git
+[submodule "rplidar_ros"]
+	path = rplidar_ros
+	url = https://github.com/Slamtec/rplidar_ros.git

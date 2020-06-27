@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gemab</name>
+  <version>0.0.1</version>
+  <description>The gemab meta package</description>
+
+  <maintainer email="kevinbretney@gmail.com">Kevin</maintainer>
+
+
+  <license>MIT</license>
+
+
+  <url type="website">http://kbrtny.com</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>gemab_bringup</exec_depend>
+  <exec_depend>gemab_description</exec_depend>
+  <exec_depend>gemab_navigation</exec_depend>
+  <exec_depend>gemab_slam</exec_depend>
+  <exec_depend>gemab_teleop</exec_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>

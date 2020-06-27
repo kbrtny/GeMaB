@@ -1,0 +1,9 @@
+<launch>
+  <arg name="set_lidar_frame_id" default="base_scan"/>
+
+  <include file="$(find gemab_bringup)/launch/gemab_base.launch"/>
+
+  <include file="$(find gemab_bringup)/launch/gemab_lidar.launch">
+    <arg name="set_frame_id" value="$(arg set_lidar_frame_id)"/>
+  </include>
+</launch>
