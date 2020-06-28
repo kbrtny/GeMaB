@@ -22,6 +22,7 @@
 #define ROBOT_MAX_VELOCITY 100
 #define ROBOT_CPR 28
 #define CONTROLLER_UPDATE_RATE 200
+#define USBCON
 
 ros::NodeHandle nh;
 
@@ -82,12 +83,12 @@ void loop() {
     last_called_time = current_time;
     leftPosition = leftEnc.read();
     rightPosition = rightEnc.read();
-    SerialUSB.print(leftPosition);
-    SerialUSB.println(rightPosition);
+    //SerialUSB.print(leftPosition);
+    //SerialUSB.println(rightPosition);
     bc.updateRotation(leftPosition, rightPosition);
-    md.enableM2Driver();
-    md.setM2Speed(200);
-    SerialUSB.println(md.getFreq());
+    //md.enableM2Driver();
+    //md.setM2Speed(200);
+    //SerialUSB.println(md.getFreq());
   }
   
   

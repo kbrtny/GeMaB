@@ -58,7 +58,7 @@ void BaseController::sendVelocity(float x, float theta)
   float diff = theta * _width / 2;
   //cheating a bit and using rotation/sec instead of rad/sec to save some math
   _leftRad = (x - diff)/_diameterConst;
-  _rightRad = x + diff/_diameterConst;
+  _rightRad = (x + diff)/_diameterConst;
 }
 
 void BaseController::updateRotation(float left, float right)
