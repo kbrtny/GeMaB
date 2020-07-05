@@ -35,13 +35,16 @@ void MotorDriver::init()
 
   #if defined(REDBOARD_TURBO)
   pwm.setClockDivider(1, true);
-  pwm.timer(0, 1, 4800, true);
-  pwm.timer(1, 1, 4800, true);
+  pwm.timer(0, 1, 48000000/MOTOR_MAX, true);
+  pwm.timer(1, 1, 48000000/MOTOR_MAX, true);
   pwm.analogWrite(9, 0);
   pwm.analogWrite(10, 0);
 
   analogReadResolution(12);
   analogReadCorrection(0, 0x0800);
+  #elif defined(ARDUINO_TEENSY30)
+  analogWriteFrequency(9, 23437.5);
+  analogWriteResolution(11);
   #endif
 }
 
@@ -54,12 +57,14 @@ void MotorDriver::setM1Speed(int speed)
     speed = -speed;
     reverse = true;
   }
-  if(speed > 1000)
+  if(speed > MOTOR_MAX)
   {
-    speed = 1000;
+    speed = MOTOR_MAX;
   }
   #if defined(REDBOARD_TURBO)
   pwm.analogWrite(_M1PWM, speed);
+  #elif defined(ARDUINO_TEENSY30)
+  analogWrite(_M1PWM, speed);
   #endif
 
   if(reverse)
@@ -81,12 +86,14 @@ void MotorDriver::setM2Speed(int speed)
     speed = -speed;
     reverse = true;
   }
-  if(speed > 1000)
+  if(speed > MOTOR_MAX)
   {
-    speed = 1000;
+    speed = MOTOR_MAX;
   }
   #if defined(REDBOARD_TURBO)
   pwm.analogWrite(_M2PWM, speed);
+  #elif defined(ARDUINO_TEENSY30)
+  analogWrite(_M2PWM, speed);
   #endif
 
   if(reverse)
@@ -225,5 +232,10 @@ unsigned int MotorDriver::getM2CurrentMilliamps()
 
 float MotorDriver::getFreq()
 {
+  #if defined(REDBOARD_TURBO)
   return pwm.frequency(0);
+  #elif defined(ARDUINO_TEENSY30)
+  return 0;
+  #endif
+  
 }

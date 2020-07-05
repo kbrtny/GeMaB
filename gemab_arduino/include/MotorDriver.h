@@ -2,9 +2,15 @@
 
 #include <Arduino.h>
 #if defined(REDBOARD_TURBO)
-  #include "SAMD21turboPWM.h"
+  //#include "SAMD21turboPWM.h"
   #include "SAMD_AnalogCorrection.h"
+  #define MOTOR_MAX 1000
+#elif defined(ARDUINO_TEENSY30)
+  #define MOTOR_MAX 2047
 #endif
+
+
+#define MOTOR_DEADBAND 5
 
 class MotorDriver
 {

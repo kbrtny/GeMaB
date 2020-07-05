@@ -31,11 +31,11 @@ import rospy
 from geometry_msgs.msg import Twist
 import sys, select, termios, tty
 
-MAX_LIN_VEL = 0.20
-MAX_ANG_VEL = 2.00
+MAX_LIN_VEL = 0.075
+MAX_ANG_VEL = 0.400
 
-LIN_VEL_STEP_SIZE = 0.01
-ANG_VEL_STEP_SIZE = 0.1
+LIN_VEL_STEP_SIZE = 0.001
+ANG_VEL_STEP_SIZE = 0.01
 
 msg = """
 Control GeMaB!

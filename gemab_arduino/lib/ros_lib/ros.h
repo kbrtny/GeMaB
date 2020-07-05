@@ -57,6 +57,10 @@ namespace ros
 
   typedef NodeHandle_<ArduinoHardware, 10, 10, 2048, 2048> NodeHandle;
 
+#elif defined(REDBOARD_TURBO) | defined(ARDUINO_TEENSY30)
+
+  typedef NodeHandle_<ArduinoHardware, 25, 25, 2048, 2048> NodeHandle;
+
 #else
 
   typedef NodeHandle_<ArduinoHardware> NodeHandle; // default 25, 25, 512, 512
