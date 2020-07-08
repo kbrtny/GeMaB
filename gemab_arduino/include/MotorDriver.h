@@ -1,13 +1,9 @@
 #pragma once
 
 #include <Arduino.h>
-#if defined(REDBOARD_TURBO)
-  //#include "SAMD21turboPWM.h"
-  #include "SAMD_AnalogCorrection.h"
-  #define MOTOR_MAX 1000
-#elif defined(ARDUINO_TEENSY30)
-  #define MOTOR_MAX 2047
-#endif
+#include <ADC.h>
+
+#define MOTOR_MAX 2047
 
 
 #define MOTOR_DEADBAND 5
@@ -37,7 +33,6 @@ class MotorDriver
     void calibrateCurrentOffsets();
     unsigned int getM1CurrentMilliamps();
     unsigned int getM2CurrentMilliamps();
-    float getFreq();
 
   protected:
     unsigned int _offsetM1;
@@ -58,6 +53,8 @@ class MotorDriver
     unsigned char _M2CS;
     static boolean _flipM1;
     static boolean _flipM2;
+
+    ADC* _adc;
     
 
 };

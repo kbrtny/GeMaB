@@ -1,10 +1,6 @@
 #include "MotorDriver.h"
 
 
-#if defined(REDBOARD_TURBO)
-  TurboPWM pwm;
-#endif
-
 MotorDriver::MotorDriver()
 {
   _M1nSLEEP = 2;
@@ -18,6 +14,8 @@ MotorDriver::MotorDriver()
   _M2DIR = 8;
   _M2PWM = 10;
   _M2CS = A1;
+
+  _adc = new ADC();
 }
 
 void MotorDriver::init()
@@ -33,19 +31,12 @@ void MotorDriver::init()
   pinMode(_M2nFAULT, INPUT_PULLUP);
   pinMode(_M2CS, INPUT);
 
-  #if defined(REDBOARD_TURBO)
-  pwm.setClockDivider(1, true);
-  pwm.timer(0, 1, 48000000/MOTOR_MAX, true);
-  pwm.timer(1, 1, 48000000/MOTOR_MAX, true);
-  pwm.analogWrite(9, 0);
-  pwm.analogWrite(10, 0);
-
-  analogReadResolution(12);
-  analogReadCorrection(0, 0x0800);
-  #elif defined(ARDUINO_TEENSY30)
+  _adc->adc0->setAveraging(4);
+  _adc->adc0->setResolution(12);
+  _adc->adc0->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED);
+  _adc->adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED);
   analogWriteFrequency(9, 23437.5);
   analogWriteResolution(11);
-  #endif
 }
 
 void MotorDriver::setM1Speed(int speed)
@@ -61,12 +52,7 @@ void MotorDriver::setM1Speed(int speed)
   {
     speed = MOTOR_MAX;
   }
-  #if defined(REDBOARD_TURBO)
-  pwm.analogWrite(_M1PWM, speed);
-  #elif defined(ARDUINO_TEENSY30)
   analogWrite(_M1PWM, speed);
-  #endif
-
   if(reverse)
   {
     digitalWrite(_M1DIR, HIGH);
@@ -90,12 +76,7 @@ void MotorDriver::setM2Speed(int speed)
   {
     speed = MOTOR_MAX;
   }
-  #if defined(REDBOARD_TURBO)
-  pwm.analogWrite(_M2PWM, speed);
-  #elif defined(ARDUINO_TEENSY30)
   analogWrite(_M2PWM, speed);
-  #endif
-
   if(reverse)
   {
     digitalWrite(_M2DIR, HIGH);
@@ -164,12 +145,12 @@ void MotorDriver::disableDrivers()
 
 unsigned int MotorDriver::getM1CurrentReading()
 {
-  return analogRead(_M1CS);
+  return _adc->analogRead(_M1CS);
 }
 
 unsigned int MotorDriver::getM2CurrentReading()
 {
-  return analogRead(_M2CS);
+  return _adc->analogRead(_M2CS);
 }
 
 // Set voltage offset of M1 current reading at 0 speed.
@@ -228,14 +209,4 @@ unsigned int MotorDriver::getM2CurrentMilliamps()
     return reading * mAPerCount;
   }
   return 0;
-}
-
-float MotorDriver::getFreq()
-{
-  #if defined(REDBOARD_TURBO)
-  return pwm.frequency(0);
-  #elif defined(ARDUINO_TEENSY30)
-  return 0;
-  #endif
-  
 }
