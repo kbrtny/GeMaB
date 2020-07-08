@@ -1,8 +1,6 @@
 
 #include "BaseController.h"
-
-
-    
+   
 BaseController::BaseController()
 {
   _leftRad = 0.0;
@@ -22,10 +20,9 @@ BaseController::BaseController()
   _odom_vel[0] = 0.0;
   _odom_vel[1] = 0.0;
   _odom_vel[2] = 0.0;
-  //_last_RotTime = millis();
 
-  _leftPID = new PID(&_leftMeasRad, &_xOutL, &_leftRad, _lKp, _lKi, _lKd, P_ON_E, DIRECT);
-  _rightPID = new PID(&_rightMeasRad, &_xOutR, &_rightRad, _rKp, _rKi, _rKd, P_ON_E, DIRECT);
+  _leftPID = new PID(&_leftMeasRad, &_xOutL, &_leftRad);
+  _rightPID = new PID(&_rightMeasRad, &_xOutR, &_rightRad);
   _motorDriver = new MotorDriver();
 
 }
@@ -35,12 +32,8 @@ void BaseController::init(ros::NodeHandle& nh)
   _nh = &nh;
   _motorDriver->init();
   _motorDriver->calibrateCurrentOffsets();
-  _leftPID->SetOutputLimits(-MOTOR_MAX, MOTOR_MAX);
-  _rightPID->SetOutputLimits(-MOTOR_MAX, MOTOR_MAX);
-  //_leftPID->SetSampleTime(20);
-  //_rightPID->SetSampleTime(20);
-  _leftPID->SetMode(AUTOMATIC);
-  _rightPID->SetMode(AUTOMATIC);
+  _leftPID->Init(MOTOR_MAX);
+  _rightPID->Init(MOTOR_MAX);
   delay(10);
 }
 
@@ -54,7 +47,7 @@ void BaseController::updateParameters(float width, float diameter, float max_v, 
   _reduction = reduction;
 }
 
-void BaseController::updatePID(double lKp, double lKi, double lKd, double rKp, double rKi, double rKd)
+void BaseController::updatePID(float lKp, float lKi, float lKd, float rKp, float rKi, float rKd)
 {
   _lKp = lKp;
   _lKi = lKi;
@@ -62,12 +55,9 @@ void BaseController::updatePID(double lKp, double lKi, double lKd, double rKp, d
   _rKp = rKp;
   _rKi = rKi;
   _rKd = rKd;
-  _leftPID->SetTunings(_lKp, _lKi, _lKd);
-  _rightPID->SetTunings(_rKp, _rKi, _rKd);
-  _last_lPerror = 0;
-  _last_rPerror = 0;
-  _lIerror = 0;
-  _rIerror = 0;
+  _leftPID->UpdateConstants(_lKp, _lKi, _lKd);
+  _rightPID->UpdateConstants(_rKp, _rKi, _rKd);
+  
   
 }
 
@@ -96,6 +86,7 @@ void BaseController::updateRotation(float left, float right, long diff_time)
   sprintf(log_msg, "Meas Rad: %f , %f", _leftMeasRad, _rightMeasRad);
   //_nh->loginfo(log_msg);
   delta_s = _diameterConst * (float)_CPR * ((float)leftPosDelta + (float)rightPosDelta) / 2.0;
+  //small angle approximation for theta
   delta_theta = _diameterConst * (float)_CPR * ((float)rightPosDelta - (float)leftPosDelta) / _width;
 
   x = cos(delta_theta) * delta_s;
@@ -127,40 +118,10 @@ void BaseController::updateOdom(nav_msgs::Odometry& odom)
 void BaseController::computeOutput(long dt)
 {
   char log_msg[50];
-  float lPerror = _leftRad - _leftMeasRad;
-  float rPerror = _rightRad - _rightMeasRad;
-  float lDerror = (_leftRad - _last_lPerror);
-  float rDerror = (_rightRad - _last_rPerror);
-  _last_lPerror = lPerror;
-  _last_rPerror = rPerror;
-  _lIerror += lPerror;
-  _rIerror += rPerror;
-
-  _xOutL += _lKp * lPerror + _lKi * _lIerror + _lKd * lDerror;
-  _xOutR += _rKp * rPerror + _rKi * _rIerror + _rKd * rDerror;
-  if(_xOutL > MOTOR_MAX)
-  {
-    _xOutL = MOTOR_MAX;
-    _lIerror = 0;
-  }else if(_xOutL < -MOTOR_MAX)
-  {
-    _xOutL = -MOTOR_MAX;
-    _lIerror = 0;
-  }
-  if(_xOutR > MOTOR_MAX)
-  {
-    _xOutR = MOTOR_MAX;
-    _rIerror = 0;
-  }else if(_xOutR < -MOTOR_MAX)
-  {
-    _xOutR = -MOTOR_MAX;
-    _rIerror = 0;
-  }
-  //int l, r;
-  //l = _leftPID->Compute();
-  //r = _rightPID->Compute();
+  _leftPID->Compute();
+  _rightPID->Compute();
   sprintf(log_msg, "IO: %f , %f, %f", _leftMeasRad, _leftRad, _xOutL);
-  _nh->loginfo(log_msg);
+  //_nh->loginfo(log_msg);
 }
 
 

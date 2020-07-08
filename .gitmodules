@@ -1,3 +1,0 @@
-[submodule "gemab_arduino/lib/Arduino_SAMD21_turbo_PWM"]
-	path = gemab_arduino/lib/Arduino_SAMD21_turbo_PWM
-	url = https://github.com/kbrtny/Arduino_SAMD21_turbo_PWM

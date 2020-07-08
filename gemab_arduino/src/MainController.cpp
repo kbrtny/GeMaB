@@ -33,28 +33,23 @@
 #define RKI LKI
 #define RKD LKD
 
-
-#define USBCON
-
+// ROS objects
 ros::NodeHandle nh;
-
 geometry_msgs::TransformStamped odom_tf;
 tf::TransformBroadcaster tf_broadcaster;
-
 nav_msgs::Odometry odom;
+
 ros::Publisher odom_pub("odom", &odom);
 
 BaseController bc;
-
-
-char odom_header_frame_id[] = "odom";
-char odom_child_frame_id[] = "base_footprint";
-char odom_tf_child_frame_id[] = "base_link";
-
 MotorDriver md;
 Encoder leftEnc(5,3);
 Encoder rightEnc(11,13);
+
 float pid_constants[6];
+char odom_header_frame_id[] = "odom";
+char odom_child_frame_id[] = "base_footprint";
+char odom_tf_child_frame_id[] = "base_link";
 
 long leftPosition, rightPosition;
 long current_time, elapsed_micros, last_called_time;
@@ -62,22 +57,13 @@ long current_time, elapsed_micros, last_called_time;
 void cmd_velCb(const geometry_msgs::Twist& cmd_msg){
     float x = cmd_msg.linear.x;
     float theta = cmd_msg.angular.z;
-
     bc.sendVelocity(x, theta);
 }
 
 ros::Subscriber<geometry_msgs::Twist> cvsub("cmd_vel", cmd_velCb );
 
-double getdTheta(double dx, double dy)
-{
-  return tan(dx/dy);
-}
 void setup() {
   nh.initNode();
-  
-  #if defined(REDBOARD_TURBO)
-  analogReadCorrection(10, 2055);
-  #endif
 
   bc.updatePID(LKP, LKI, LKD, RKP, RKI, RKD);
   bc.updateParameters(ROBOT_WIDTH, ROBOT_WHEEL_DIAMETER, ROBOT_MAX_VELOCITY, ROBOT_CPR, CONTROLLER_UPDATE_RATE, ROBOT_DRIVE_GEAR_REDUCTION);
@@ -90,6 +76,8 @@ void setup() {
   nh.subscribe(cvsub);
   nh.advertise(odom_pub);
   tf_broadcaster.init(nh);
+  odom.header.frame_id = odom_header_frame_id;
+  odom.child_frame_id = odom_child_frame_id;
   odom_tf.header.frame_id = odom_header_frame_id;
   odom_tf.child_frame_id = odom_tf_child_frame_id;
   
@@ -113,50 +101,21 @@ void loop() {
     leftPosition = leftEnc.read();
     rightPosition = rightEnc.read();
 
-
-    //odom.pose.pose.position.x = leftPosition;
-    //odom.pose.pose.position.y = rightPosition;
     bc.updateRotation(leftPosition, rightPosition, elapsed_micros);
     bc.computeOutput(elapsed_micros);
     bc.updateOutput();
     bc.updateOdom(odom);
-    odom.header.frame_id = odom_header_frame_id;
-    odom.child_frame_id = odom_child_frame_id;
+    
+    odom_pub.publish(&odom);
+
     odom_tf.transform.translation.x = odom.pose.pose.position.x;
     odom_tf.transform.translation.y = odom.pose.pose.position.y;
     odom_tf.transform.rotation = odom.pose.pose.orientation;
-    odom_tf.header.stamp = nh.now();
-    //nh.loginfo("loop1");
-  
+    odom_tf.header.stamp = nh.now();  
     tf_broadcaster.sendTransform(odom_tf);
-    odom_pub.publish(&odom);
-    //md.enableM2Driver();
-    //md.setM2Speed(200);
+    
+
   }
-  /*
-  if (! nh.getParam("~pid", pid_constants, 6))
-  {
-    pid_constants[0] = LKP;
-    pid_constants[1] = LKI;
-    pid_constants[2] = LKD;
-    pid_constants[3] = RKP;
-    pid_constants[4] = RKI;
-    pid_constants[5] = RKD;
-  }else
-  {
-    bc.updatePID(pid_constants[0], 
-                pid_constants[1], 
-                pid_constants[2], 
-                pid_constants[3], 
-                pid_constants[4], 
-                pid_constants[5]);
-                
-  }
-  */
-  
-  
-  
-  
   nh.spinOnce();
 
 }
