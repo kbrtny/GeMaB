@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+  <robot name="gemab">
+
+	<link name="base_link">
+		<visual>
+			<geometry>
+				<box size="0.47 0.23 0.20"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0.0 0.0 0.1"/>
+			<material name="blue">
+			    <color rgba="0 0 .8 1"/>
+		    </material>
+		</visual>
+	</link>
+
+	<link name="wheel_left">
+		<visual>
+			<geometry>
+				<cylinder length="0.01" radius="0.09"/>
+			</geometry>
+			<origin rpy="1.57 0 0" xyz="0.2 -0.185 0.1"/>
+			<material name="black">
+			    <color rgba="0 0 0 1"/>
+		    </material>
+		</visual>
+	</link>
+
+	<link name="wheel_right">
+		<visual>
+			<geometry>
+				<cylinder length="0.01" radius="0.09"/>
+			</geometry>
+			<origin rpy="1.57 0 0" xyz="0.2 0.185 0.1"/>
+			<material name="red">
+			    <color rgba="0.8 0 0 1"/>
+		    </material>
+		</visual>
+	</link>
+
+	<joint name="base_to_wheel_left" type="fixed">
+      <parent link="base_link"/>
+      <child link="wheel_left"/>
+      <origin xyz="0 0 0"/>
+    </joint>
+
+    <joint name="base_to_wheel_right" type="fixed">
+      <parent link="base_link"/>
+      <child link="wheel_right"/>
+      <origin xyz="0 0 0"/>
+    </joint>
+
+  </robot>
