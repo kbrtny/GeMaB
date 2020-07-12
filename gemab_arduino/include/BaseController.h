@@ -18,7 +18,7 @@ class BaseController
 {
   public:
     BaseController();
-    void init(ros::NodeHandle& nh);
+    void init(ros::NodeHandle& nh, ADC& main_adc);
     void updateParameters(float width, float diameter, float max_v, int cpr, int rate, float reduction);
     void updatePID(float lKp, float lKi, float lKd, float rKp, float rKi, float rKd);
     void sendVelocity(float x, float theta);

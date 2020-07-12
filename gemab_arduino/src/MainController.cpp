@@ -12,6 +12,7 @@
 #include <tf/transform_broadcaster.h>
 #include <geometry_msgs/Twist.h>
 #include <std_msgs/String.h>
+#include <sensor_msgs/BatteryState.h>
 
 #if defined (TEENSY)
   #define ENCODER_OPTIMIZE_INTERRUPTS
@@ -25,6 +26,8 @@
 #define ROBOT_CPR 28
 #define CONTROLLER_UPDATE_RATE 10
 #define ROBOT_DRIVE_GEAR_REDUCTION 40
+#define BATT_VOLT_SCALE 3.3/4096*7.0455
+#define BATTERY_VOLTAGE_PIN A2
 
 #define LKP 100.0
 #define LKI 0.0
@@ -38,13 +41,16 @@ ros::NodeHandle nh;
 geometry_msgs::TransformStamped odom_tf;
 tf::TransformBroadcaster tf_broadcaster;
 nav_msgs::Odometry odom;
+sensor_msgs::BatteryState battery_state;
 
 ros::Publisher odom_pub("odom", &odom);
+ros::Publisher batt_pub("battery", &battery_state);
 
 BaseController bc;
 MotorDriver md;
 Encoder leftEnc(5,3);
 Encoder rightEnc(11,13);
+ADC adc;
 
 float pid_constants[6];
 char odom_header_frame_id[] = "odom";
@@ -64,10 +70,14 @@ ros::Subscriber<geometry_msgs::Twist> cvsub("cmd_vel", cmd_velCb );
 
 void setup() {
   nh.initNode();
-
+  
+  adc.adc0->setAveraging(4);
+  adc.adc0->setResolution(12);
+  adc.adc0->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED);
+  adc.adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED);
   bc.updatePID(LKP, LKI, LKD, RKP, RKI, RKD);
   bc.updateParameters(ROBOT_WIDTH, ROBOT_WHEEL_DIAMETER, ROBOT_MAX_VELOCITY, ROBOT_CPR, CONTROLLER_UPDATE_RATE, ROBOT_DRIVE_GEAR_REDUCTION);
-  bc.init(nh);
+  bc.init(nh, adc);
 
   leftPosition = 0;
   rightPosition = 0;
@@ -75,11 +85,14 @@ void setup() {
   nh.initNode();
   nh.subscribe(cvsub);
   nh.advertise(odom_pub);
+  nh.advertise(batt_pub);
   tf_broadcaster.init(nh);
   odom.header.frame_id = odom_header_frame_id;
   odom.child_frame_id = odom_child_frame_id;
   odom_tf.header.frame_id = odom_header_frame_id;
   odom_tf.child_frame_id = odom_tf_child_frame_id;
+  battery_state.power_supply_technology = sensor_msgs::BatteryState::POWER_SUPPLY_TECHNOLOGY_LIPO;
+  battery_state.power_supply_health = sensor_msgs::BatteryState::POWER_SUPPLY_HEALTH_GOOD;
   
   while (!nh.connected())
   {
@@ -114,6 +127,8 @@ void loop() {
     odom_tf.header.stamp = nh.now();  
     tf_broadcaster.sendTransform(odom_tf);
     
+    battery_state.voltage = adc.analogRead(BATTERY_VOLTAGE_PIN) * BATT_VOLT_SCALE;
+    batt_pub.publish(&battery_state);
 
   }
   nh.spinOnce();

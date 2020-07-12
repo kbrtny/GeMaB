@@ -14,7 +14,7 @@ class MotorDriver
     // CONSTRUCTORS
     MotorDriver();
     // PUBLIC METHODS
-    void init();
+    void init(ADC& main_adc);
     void setM1Speed(int speed); // Set speed for M1.
     void setM2Speed(int speed); // Set speed for M2.
     void setSpeeds(int m1Speed, int m2Speed); // Set speed for both M1 and M2.

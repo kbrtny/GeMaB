@@ -27,10 +27,10 @@ BaseController::BaseController()
 
 }
 
-void BaseController::init(ros::NodeHandle& nh)
+void BaseController::init(ros::NodeHandle& nh, ADC& main_adc)
 {
   _nh = &nh;
-  _motorDriver->init();
+  _motorDriver->init(main_adc);
   _motorDriver->calibrateCurrentOffsets();
   _leftPID->Init(MOTOR_MAX);
   _rightPID->Init(MOTOR_MAX);

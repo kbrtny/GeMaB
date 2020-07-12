@@ -15,10 +15,9 @@ MotorDriver::MotorDriver()
   _M2PWM = 10;
   _M2CS = A1;
 
-  _adc = new ADC();
 }
 
-void MotorDriver::init()
+void MotorDriver::init(ADC& main_adc)
 {
   pinMode(_M1nSLEEP, OUTPUT);
   pinMode(_M2nSLEEP, OUTPUT);
@@ -31,10 +30,7 @@ void MotorDriver::init()
   pinMode(_M2nFAULT, INPUT_PULLUP);
   pinMode(_M2CS, INPUT);
 
-  _adc->adc0->setAveraging(4);
-  _adc->adc0->setResolution(12);
-  _adc->adc0->setConversionSpeed(ADC_CONVERSION_SPEED::HIGH_SPEED);
-  _adc->adc0->setSamplingSpeed(ADC_SAMPLING_SPEED::MED_SPEED);
+  _adc = &main_adc;
   analogWriteFrequency(9, 23437.5);
   analogWriteResolution(11);
 }
