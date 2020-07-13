@@ -29,7 +29,7 @@
 #define BATT_VOLT_SCALE 3.3/4096*7.0455
 #define BATTERY_VOLTAGE_PIN A2
 
-#define LKP 100.0
+#define LKP 2.0
 #define LKI 0.0
 #define LKD 0.0
 #define RKP LKP
@@ -55,7 +55,7 @@ ADC adc;
 float pid_constants[6];
 char odom_header_frame_id[] = "odom";
 char odom_child_frame_id[] = "base_footprint";
-char odom_tf_child_frame_id[] = "base_link";
+char odom_tf_child_frame_id[] = "base_footprint";
 
 long leftPosition, rightPosition;
 long current_time, elapsed_micros, last_called_time;

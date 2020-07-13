@@ -40,7 +40,8 @@ void BaseController::init(ros::NodeHandle& nh, ADC& main_adc)
 void BaseController::updateParameters(float width, float diameter, float max_v, int cpr, int rate, float reduction)
 {
   _width = width;
-  _diameterConst = diameter * 3.14159 / reduction;
+  _diameterConst = diameter * 3.14159 / reduction;  //wheel meters per motor revolution
+  _CPM = _diameterConst / (float)cpr;  //encoder counts per meter
   _CPR = cpr;
   _rate = rate;
   _max_v = max_v;
@@ -68,29 +69,32 @@ void BaseController::sendVelocity(float x, float theta)
   //cheating a bit and using rotation/sec instead of rad/sec to save some math
   _leftRad = (x - diff) / _diameterConst;
   _rightRad = (x + diff) / _diameterConst;
-  sprintf(log_msg, "Des Rad: %f , %f", _leftRad, _rightRad);
-  _nh->loginfo(log_msg);
+  //sprintf(log_msg, "Des Rad: %f , %f", _leftRad, _rightRad);
+  //_nh->loginfo(log_msg);
 }
 
 void BaseController::updateRotation(float left, float right, long diff_time)
 {
-  char log_msg[50];
+  char log_msg1[60];
+  char log_msg2[60];
   long leftPosDelta = left - _lastLeftPosition;
   long rightPosDelta = right - _lastRightPosition;
-  float deltaTimeMinute = (float)diff_time / 60000.0;
+  float deltaTimeSecond = (float)diff_time / 1000000.0;
   float x, y, v, w, delta_s, delta_theta;
   _lastLeftPosition = left;
   _lastRightPosition = right;
-  _leftMeasRad = ((float)leftPosDelta/(float)_CPR)/deltaTimeMinute;
-  _rightMeasRad = ((float)rightPosDelta/(float)_CPR)/deltaTimeMinute;
-  sprintf(log_msg, "Meas Rad: %f , %f", _leftMeasRad, _rightMeasRad);
-  //_nh->loginfo(log_msg);
-  delta_s = _diameterConst * (float)_CPR * ((float)leftPosDelta + (float)rightPosDelta) / 2.0;
+  _leftMeasRad = (float)leftPosDelta/deltaTimeSecond/(float)_CPR;
+  _rightMeasRad = (float)rightPosDelta/deltaTimeSecond/(float)_CPR;
+  //sprintf(log_msg1, "M: %f , %f, %f , %f", deltaTimeSecond, leftPosDelta, _leftRad, _leftMeasRad);
+  //_nh->loginfo(log_msg1);
+  delta_s = _CPM * (((float)leftPosDelta + (float)rightPosDelta) / 2.0);
   //small angle approximation for theta
-  delta_theta = _diameterConst * (float)_CPR * ((float)rightPosDelta - (float)leftPosDelta) / _width;
-
+  delta_theta = _CPM * (((float)rightPosDelta - (float)leftPosDelta) / _width);
+  
   x = cos(delta_theta) * delta_s;
   y = -sin(delta_theta) * delta_s;
+  //sprintf(log_msg2, "Pose: S: %4.3f , Th: %2.3f, X: %4.3f , Y: %4.3f", delta_s, delta_theta, x, y);
+  //_nh->loginfo(log_msg2);
   _odom_pose[0] += cos(_odom_pose[2]) * x - sin(_odom_pose[2]) * y;
   _odom_pose[1] += sin(_odom_pose[2]) * x + cos(_odom_pose[2]) * y;
   _odom_pose[2] += delta_theta;

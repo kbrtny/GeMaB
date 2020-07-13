@@ -33,6 +33,7 @@ class BaseController
     float _diameterConst;
     float _max_v;
     int _CPR;
+    float _CPM;
     int _rate;
     float _reduction;
     float _leftRad;
