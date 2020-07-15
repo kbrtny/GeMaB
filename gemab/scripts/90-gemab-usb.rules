@@ -1,0 +1,2 @@
+KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0" SYMLINK+="teensy0"
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4" SYMLINK+="rplidar0"

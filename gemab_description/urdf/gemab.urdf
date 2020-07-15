@@ -43,6 +43,16 @@
 		</visual>
 	</link>
 
+	<link name="base_scan">
+		<visual>
+			<geometry>
+				<cylinder length="0.005" radius="0.04"/>
+			</geometry>
+			<origin rpy="0 0 0" xyz="0 0 0"/>
+			<material name="black"/>
+		</visual>
+	</link>
+
 	<joint name="base_joint" type="fixed">
 		<parent link="base_footprint"/>
 		<child link="base_link"/>
@@ -61,6 +71,12 @@
 		<child link="wheel_right"/>
 		<origin xyz="0.235 0.185 0.045"/>
 		<axis xyz="0 0 1"/>
+    </joint>
+
+    <joint name="base_to_laser" type="fixed">
+      <parent link="base_link"/>
+      <child link="base_scan"/>
+      <origin xyz="0.0 0.0 0.1"/>
     </joint>
 
 	</robot>
