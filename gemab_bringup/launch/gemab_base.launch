@@ -1,7 +1,6 @@
 <launch>
   <node pkg="rosserial_python" type="serial_node.py" name="gemab_serial_base" output="screen">
-    <param name="port" value="/dev/teensy0"/>
+    <param name="port" value="/dev/ttyACM0"/>
     <param name="baud" value="57600"/>
   </node>
-    <rosparam param="gemab_serial_base/pid">[1.0, 0.001, 0.0001, 1.0, 0.002, 0.0002]</rosparam>
 </launch>

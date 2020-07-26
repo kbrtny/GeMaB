@@ -6,4 +6,5 @@
   <include file="$(find gemab_bringup)/launch/gemab_lidar.launch">
     <arg name="set_frame_id" value="$(arg set_lidar_frame_id)"/>
   </include>
+
 </launch>

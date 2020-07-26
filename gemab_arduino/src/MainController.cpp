@@ -119,15 +119,18 @@ void loop() {
     bc.updateOutput();
     bc.updateOdom(odom);
     
-    odom_pub.publish(&odom);
+    
 
+    odom_tf.header.stamp = stamp_now;
     odom_tf.transform.translation.x = odom.pose.pose.position.x;
     odom_tf.transform.translation.y = odom.pose.pose.position.y;
     odom_tf.transform.rotation = odom.pose.pose.orientation;
-    odom_tf.header.stamp = nh.now();  
-    tf_broadcaster.sendTransform(odom_tf);
     
+    battery_state.header.stamp = stamp_now;
     battery_state.voltage = adc.analogRead(BATTERY_VOLTAGE_PIN) * BATT_VOLT_SCALE;
+
+    odom_pub.publish(&odom);
+    tf_broadcaster.sendTransform(odom_tf);
     batt_pub.publish(&battery_state);
 
   }
