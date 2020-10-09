@@ -1,3 +1,4 @@
+#pragma once
 #ifndef ROOM_MANAGER_H
 #define ROOM_MANAGER_H
 
@@ -5,6 +6,10 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "json.hpp"
+
+// for convenience
+//using nlohmann::json;
 
 struct Point {
 	float x;
@@ -12,16 +17,21 @@ struct Point {
 	float z;
 };
 
+
 struct RoomPolygon {
 	int id;
-	std::string currentRoomName;
+	std::string roomName;
 
-	uint32_t numRoomVertex;
-    std::vector <float> roomX;
-    std::vector <float> roomY;
+	uint polyCorners;
+    std::vector <float> polyX;
+    std::vector <float> polyY;
     
     std::vector <float> constant;
     std::vector <float> multiple;
+    RoomPolygon () {}
+    RoomPolygon(int id, std::string name, uint polyCorners) : id(id), roomName(name), polyCorners(polyCorners)
+	{
+	}
 };
 
 struct Room {
@@ -75,13 +85,17 @@ class RoomManager
         void PrintObject(int id);
         int UpdateRoomName(int roomId, std::string new_name);
         //void LoadMap(const std::string& map_file);
+        nlohmann::json RoomToJson(Room room_in);
         int GetCurrentRoomId(float x, float y);
+        bool InRoom(float x, float y, RoomPolygon test_room);
         int GetInitialRoomId(float x, float y);
     private:
     	std::vector<Room> rooms;
     	std::vector<Entry> entries;
     	std::vector<Objects> objects;
+    	std::vector<RoomPolygon> computedRooms;
     	std::string currentRoom;
+    	void PreCalcRoom(int id);
     	int currentRoomid;
 };
 

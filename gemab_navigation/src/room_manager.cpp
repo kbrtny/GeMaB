@@ -1,5 +1,70 @@
 #include "../include/room_manager.h"
 
+void to_json(nlohmann::json& j, const Point& p)
+{
+	j = nlohmann::json{ { "x", p.x },{ "y", p.y },{ "z", p.z }};
+}
+
+void from_json(const nlohmann::json& j, Point& p)
+{
+	j.at("x").get_to(p.x);
+	j.at("y").get_to(p.y);
+	j.at("z").get_to(p.z);
+}
+
+void to_json(nlohmann::json& j, const Room& r)
+{
+	j = nlohmann::json{ 
+		{ "id", r.id },
+		{ "roomName", r.roomName },
+		{ "vertex", r.vertex },
+		{ "entryIds", r.entryIds },
+		{ "objectIds", r.objectIds }
+	};
+}
+
+void from_json(const nlohmann::json& j, Room& r)
+{
+	j.at("id").get_to(r.id);
+	j.at("roomName").get_to(r.roomName);
+	j.at("vertex").get_to(r.vertex);
+	j.at("entryIds").get_to(r.entryIds);
+	j.at("objectIds").get_to(r.objectIds);
+}
+
+void to_json(nlohmann::json& j, const Entry& r)
+{
+	j = nlohmann::json{ 
+		{ "id", r.id },
+		{ "entryName", r.entryName },
+		{ "vertex", r.vertex },
+		{ "connectedRoomIds", r.connectedRoomIds }
+	};
+}
+
+void from_json(const nlohmann::json& j, Entry& r)
+{
+	j.at("id").get_to(r.id);
+	j.at("entryName").get_to(r.entryName);
+	j.at("vertex").get_to(r.vertex);
+	j.at("connectedRoomIds").get_to(r.connectedRoomIds);
+}
+
+void to_json(nlohmann::json& j, const Objects& r)
+{
+	j = nlohmann::json{ 
+		{ "id", r.id },
+		{ "objectName", r.objectName },
+		{ "properties", r.properties }
+	};
+}
+
+void from_json(const nlohmann::json& j, Objects& r)
+{
+	j.at("id").get_to(r.id);
+	j.at("objectName").get_to(r.objectName);
+	j.at("properties").get_to(r.properties);
+}
 
 Room RoomManager::CreateRoom(std::string name, std::vector <Point> vertices)
 {
@@ -31,6 +96,7 @@ int RoomManager::AddRoom(Room room_to_add)
 {
 	room_to_add.id = rooms.size();
 	rooms.push_back(room_to_add);
+	PreCalcRoom(room_to_add.id);
 	return room_to_add.id;
 }
 
@@ -127,10 +193,75 @@ int RoomManager::UpdateRoomName(int roomId, std::string new_name)
 
 }*/
 
+nlohmann::json RoomManager::RoomToJson(Room room_in)
+{
+	nlohmann::json j = room_in;
+
+	return j;
+}
+
+//Base on http://alienryderflex.com/polygon/
+void RoomManager::PreCalcRoom(int id)
+{
+	RoomPolygon new_roomPolygon(id, rooms[id].roomName, rooms[id].vertex.size());
+	for(auto i=rooms[id].vertex.begin(); i != rooms[id].vertex.end(); ++i)
+	{
+		new_roomPolygon.polyX.push_back(i->x);
+		new_roomPolygon.polyY.push_back(i->y);
+	}
+	uint i, j=rooms[id].vertex.size()-1;
+	for(i=0; i < rooms[id].vertex.size(); i++)
+	{
+		if(new_roomPolygon.polyY[j]==new_roomPolygon.polyY[i])
+		{
+			new_roomPolygon.constant.push_back(new_roomPolygon.polyX[i]);
+			new_roomPolygon.multiple.push_back(0);
+		}else
+		{
+			new_roomPolygon.constant.push_back(new_roomPolygon.polyX[i]-(new_roomPolygon.polyY[i]*new_roomPolygon.polyX[j])/(new_roomPolygon.polyY[j]-new_roomPolygon.polyY[i])+(new_roomPolygon.polyY[j]*new_roomPolygon.polyX[i])/(new_roomPolygon.polyY[j]-new_roomPolygon.polyY[i]));
+      		new_roomPolygon.multiple.push_back((new_roomPolygon.polyX[j]-new_roomPolygon.polyX[i])/(new_roomPolygon.polyY[j]-new_roomPolygon.polyY[i])); 
+		}
+		j = i;
+	}
+	computedRooms.push_back(new_roomPolygon);
+}
+
+
 int RoomManager::GetCurrentRoomId(float x, float y)
 {
-	std::cout << "Coords: " << x << " , " << y;
-	return 0;
+	int currentroom = -1;
+	for( auto i=computedRooms.begin(); i!= computedRooms.end(); ++i)
+	{
+		if(InRoom(x,y,*i))
+		{
+			currentroom = i->id;
+			std::cout << "Current Room is: " << i->roomName << std::endl;
+		}
+	}
+	/*
+	if(currentroom < 0)
+	{
+		std::cout << "Not in a room." << std::endl;
+	}
+	*/
+	return currentroom;
+}
+
+bool RoomManager::InRoom(float x, float y, RoomPolygon test_room)
+{
+	uint i, j = test_room.polyCorners-1;
+	bool oddNodes=0;
+
+	for(i = 0; i<test_room.polyCorners; i++)
+	{
+		if((test_room.polyY[i] < y && test_room.polyY[j] >=y) 
+			|| (test_room.polyY[j] < y && test_room.polyY[i] >=y))
+		{
+			oddNodes^=(y * test_room.multiple[i] + test_room.constant[i] < x);
+		}
+		j=i;
+	}
+	return oddNodes;
 }
 
 int RoomManager::GetInitialRoomId(float x, float y)

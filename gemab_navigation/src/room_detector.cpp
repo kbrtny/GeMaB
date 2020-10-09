@@ -1,5 +1,7 @@
 #include "../include/room_manager.h"
 
+//using Point = pt::Point;
+
 int main() {
 	RoomManager my_home;
 	std::vector<Point>  roomacoords {
@@ -21,19 +23,24 @@ int main() {
 
 
 	Room testrooma = my_home.CreateRoom("rooma", roomacoords);
-	my_home.PrintRoom(testrooma.id);
+	//my_home.PrintRoom(testrooma.id);
+	std::cout << my_home.RoomToJson(testrooma) << std::endl;
 	my_home.UpdateRoomName(testrooma.id, "Foyer");
-	
+
 	Room testroomb = my_home.CreateRoom("roomb", roombcoords);
-	my_home.PrintRoom(testroomb.id);
+	//my_home.PrintRoom(testroomb.id);
 	int roomsconnected[2] = {testrooma.id, testroomb.id};
 
+	my_home.GetCurrentRoomId(0.1,0.1);
+	my_home.GetCurrentRoomId(0,0);
+	my_home.GetCurrentRoomId(5,6);
+	my_home.GetCurrentRoomId(20,20);
 	Entry firstentry = my_home.CreateEntry("firstentry", entrycoords, roomsconnected);
-	my_home.PrintEntry(firstentry.id);
+	//my_home.PrintEntry(firstentry.id);
 
 	Objects firstobject = my_home.CreateObject("book", {"red", "big"});
 	my_home.AddObject(firstobject, testrooma.id);
-	my_home.PrintObject(firstobject.id);
+	//my_home.PrintObject(firstobject.id);
 
-	my_home.PrintRoom(testrooma.id);
+	//my_home.PrintRoom(testrooma.id);
 }
