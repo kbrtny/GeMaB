@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include "json.hpp"
 
 // for convenience
@@ -85,7 +87,8 @@ class RoomManager
         void PrintObject(int id);
         int UpdateRoomName(int roomId, std::string new_name);
         //void LoadMap(const std::string& map_file);
-        nlohmann::json RoomToJson(Room room_in);
+        void ExportToJSON(std::string);
+        int ImportFromJSON(std::string filename);
         std::string GetRoomNameFromId(int id);
         int GetCurrentRoomId(float x, float y);
         bool InRoom(float x, float y, RoomPolygon test_room);

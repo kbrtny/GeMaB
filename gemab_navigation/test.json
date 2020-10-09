@@ -1,0 +1,106 @@
+{
+    "Entries": [
+        {
+            "connectedRoomIds": [
+                0,
+                1
+            ],
+            "entryName": "moddedentry",
+            "id": 0,
+            "vertex": [
+                {
+                    "x": 4.0,
+                    "y": 5.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 6.0,
+                    "y": 5.0,
+                    "z": 0.0
+                }
+            ]
+        }
+    ],
+    "Objects": [
+        {
+            "id": 0,
+            "objectName": "book",
+            "properties": [
+                "red",
+                "big"
+            ]
+        },
+        {
+            "id": 1,
+            "objectName": "magazine",
+            "properties": [
+                "blue",
+                "thin"
+            ]
+        }
+    ],
+    "Rooms": [
+        {
+            "entryIds": [
+                0
+            ],
+            "id": 0,
+            "objectIds": [
+                0
+            ],
+            "roomName": "Foyer",
+            "vertex": [
+                {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 10.0,
+                    "y": 0.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 10.0,
+                    "y": 5.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.0,
+                    "y": 5.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "entryIds": [
+                0
+            ],
+            "id": 1,
+            "objectIds": [],
+            "roomName": "roomb",
+            "vertex": [
+                {
+                    "x": 0.0,
+                    "y": 5.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 10.0,
+                    "y": 5.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 10.0,
+                    "y": 10.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.0,
+                    "y": 10.0,
+                    "z": 0.0
+                }
+            ]
+        }
+    ]
+}

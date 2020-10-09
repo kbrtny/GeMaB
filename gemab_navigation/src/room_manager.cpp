@@ -193,11 +193,39 @@ int RoomManager::UpdateRoomName(int roomId, std::string new_name)
 
 }*/
 
-nlohmann::json RoomManager::RoomToJson(Room room_in)
+void RoomManager::ExportToJSON(std::string filename)
 {
-	nlohmann::json j = room_in;
+	nlohmann::json j;
+	j["Rooms"] = rooms;
+	j["Entries"] = entries;
+	j["Objects"] = objects;
 
-	return j;
+	std::ofstream o;
+	o.open(filename);
+
+	o << std::setw(4) << j << std::endl;
+	o.close();
+
+}
+
+int RoomManager::ImportFromJSON(std::string filename)
+{
+	nlohmann::json j;
+	std::ifstream readFromFile(filename);
+	if(readFromFile.is_open())
+	{
+		readFromFile >> j;
+		rooms = j["Rooms"].get<std::vector<Room>>();
+		entries = j["Entries"].get<std::vector<Entry>>();
+		objects = j["Objects"].get<std::vector<Objects>>();
+	}
+	for(auto i=rooms.begin(); i != rooms.end(); ++i)
+	{
+		//PrintRoom(i->id);
+		PreCalcRoom(i->id);
+	}
+	readFromFile.close();
+	return 0;
 }
 
 //Base on http://alienryderflex.com/polygon/
