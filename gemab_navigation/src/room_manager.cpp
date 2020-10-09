@@ -226,6 +226,18 @@ void RoomManager::PreCalcRoom(int id)
 	computedRooms.push_back(new_roomPolygon);
 }
 
+std::string RoomManager::GetRoomNameFromId(int id)
+{
+	std::string name;
+	for(auto i=rooms.begin(); i != rooms.end(); ++i)
+	{
+		if(i->id == id)
+		{
+			name = i->roomName;
+		}
+	}
+	return name;
+}
 
 int RoomManager::GetCurrentRoomId(float x, float y)
 {
@@ -235,7 +247,7 @@ int RoomManager::GetCurrentRoomId(float x, float y)
 		if(InRoom(x,y,*i))
 		{
 			currentroom = i->id;
-			std::cout << "Current Room is: " << i->roomName << std::endl;
+			//std::cout << "Current Room is: " << i->roomName << std::endl;
 		}
 	}
 	/*

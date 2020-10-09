@@ -86,6 +86,7 @@ class RoomManager
         int UpdateRoomName(int roomId, std::string new_name);
         //void LoadMap(const std::string& map_file);
         nlohmann::json RoomToJson(Room room_in);
+        std::string GetRoomNameFromId(int id);
         int GetCurrentRoomId(float x, float y);
         bool InRoom(float x, float y, RoomPolygon test_room);
         int GetInitialRoomId(float x, float y);

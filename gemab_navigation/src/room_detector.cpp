@@ -4,6 +4,8 @@
 
 int main() {
 	RoomManager my_home;
+	int temp;
+
 	std::vector<Point>  roomacoords {
 		{0, 0, 0},
 		{10, 0, 0},
@@ -24,14 +26,16 @@ int main() {
 
 	Room testrooma = my_home.CreateRoom("rooma", roomacoords);
 	//my_home.PrintRoom(testrooma.id);
-	std::cout << my_home.RoomToJson(testrooma) << std::endl;
+	//std::cout << my_home.RoomToJson(testrooma) << std::endl;
 	my_home.UpdateRoomName(testrooma.id, "Foyer");
 
 	Room testroomb = my_home.CreateRoom("roomb", roombcoords);
 	//my_home.PrintRoom(testroomb.id);
 	int roomsconnected[2] = {testrooma.id, testroomb.id};
 
-	my_home.GetCurrentRoomId(0.1,0.1);
+	temp = my_home.GetCurrentRoomId(0.1,0.1);
+	std::cout << "Currently in: " << my_home.GetRoomNameFromId(temp) << std::endl;
+
 	my_home.GetCurrentRoomId(0,0);
 	my_home.GetCurrentRoomId(5,6);
 	my_home.GetCurrentRoomId(20,20);

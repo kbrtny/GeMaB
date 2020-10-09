@@ -99,8 +99,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs gemab_msgs)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES gemab_navigation
+  INCLUDE_DIRS include
+  LIBRARIES room_manager
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -117,9 +117,9 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/gemab_navigation.cpp
-# )
+add_library(room_manager
+  src/room_manager.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -142,7 +142,11 @@ add_executable(room_detector_node src/room_detector_node.cpp)
 add_dependencies(room_detector_node ${room_detector_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+ target_link_libraries(room_manager
+   ${catkin_LIBRARIES}
+ )
  target_link_libraries(room_detector_node
+   room_manager
    ${catkin_LIBRARIES}
  )
 
